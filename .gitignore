@@ -1,0 +1,31 @@
+# Dependencies and Caches
+node_modules/
+frontend/node_modules/
+backend/__pycache__/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Large Files & Data (Crucial for GitHub)
+models/
+dataset/
+*.pt
+*.pth
+
+# Environments
+.env
+frontend/.env*
+
+# Next.js and Build
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# OS and IDEs
+.DS_Store
+.vscode/
+.idea/
+
+
+AI_Engineer_Challenge.docx.txt
