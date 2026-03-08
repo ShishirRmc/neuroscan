@@ -8,10 +8,11 @@ __pycache__/
 venv/
 
 # Large Files & Data (Crucial for GitHub)
-models/
+models/* !models/*.json !models/*.npy
 dataset/
 *.pt
 *.pth
+
 
 # Environments
 .env
