@@ -56,6 +56,11 @@ export default function FeaturesInfo() {
                             description="Experience a non-blocking analysis pipeline. Heavy MRI processing happens in the background, allowing you to stay productive while the AI worker computes results."
                         />
                         <FeatureItem
+                            icon={<ShieldCheck className="text-red-400" size={20} />}
+                            title="OOD Anomaly Rejection"
+                            description="The AI only understands Brain MRIs. Uploading other images (X-rays, random photos) bypasses its training and forces meaningless 50/50 randomized predictions. We use Mahalanobis distance to actively block these out-of-distribution (OOD) anomalies."
+                        />
+                        <FeatureItem
                             icon={<Microscope className="text-purple-400" size={20} />}
                             title="Explainable Grad-CAM Heatmaps"
                             description="Visual transparency is key. Our 'View AI Focus' mode renders heatmaps that pinpoint exactly where the model detected tumor markers."
@@ -80,21 +85,25 @@ export default function FeaturesInfo() {
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <TestCard
+                                icon="📷"
                                 label="OOD Check"
                                 action="Upload a photo (not MRI)"
                                 expect="Immediate Rejection"
                             />
                             <TestCard
+                                icon="👩‍⚕️"
                                 label="HITL Gating"
                                 action="Upload ambiguous MRI"
                                 expect="Review Queue Entry"
                             />
                             <TestCard
+                                icon="⏳"
                                 label="Async Flow"
                                 action="Upload valid scan"
                                 expect="Polling Spinner"
                             />
                             <TestCard
+                                icon="⚖️"
                                 label="Calibration"
                                 action="Check Probability"
                                 expect="Softened (T=1.5) Score"

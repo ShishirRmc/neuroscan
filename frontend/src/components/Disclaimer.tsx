@@ -21,7 +21,10 @@ export default function Disclaimer() {
                 >
                     This tool is a research prototype and does not provide clinical
                     diagnoses. All outputs are AI-generated assessments and must be
-                    reviewed by a qualified medical professional.
+                    reviewed by a qualified medical professional. This model was strictly
+                    trained on axial T1-weighted Brain MRIs. Uploading other modalities
+                    (e.g., X-Rays, natural images, or other body parts) will result in
+                    unpredictable and mathematically invalid predictions.
                 </p>
             </div>
         </div>

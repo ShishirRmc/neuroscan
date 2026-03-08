@@ -148,12 +148,21 @@ async def predict(
     if not model_service.is_valid_modality(image_bytes):
         raise HTTPException(
             status_code=400,
-            detail="Out-of-Distribution Error: Please upload a valid brain MRI scan."
+            detail="The AI rejected this image. This model is only trained to understand Brain MRIs. Because AI models mathematically force a prediction even on data they don't understand, the system has blocked this file to prevent an invalid result."
         )
 
-    # ── 5. Create initial log entry ─────────────────────────────────
+    # ── 5. Create initial log entry and save image ──────────────────
     image_hash = hashlib.sha256(image_bytes).hexdigest()
     now = datetime.now(timezone.utc)
+    
+    # Ensure uploads directory exists
+    import os
+    os.makedirs("uploads", exist_ok=True)
+    
+    # Save the image bytes to disk
+    image_path = os.path.join("uploads", f"{image_hash}.png")
+    with open(image_path, "wb") as f:
+        f.write(image_bytes)
     
     log_entry = InferenceLog(
         timestamp=now,
@@ -253,6 +262,30 @@ async def get_history(
     return HistoryResponse(items=items, total=total, page=page, page_size=page_size)
 
 
+# ── GET /history/{id}/image ─────────────────────────────────────────────
+from fastapi.responses import FileResponse
+import os
+
+@app.get(
+    "/history/{id}/image",
+    summary="Retrieve the original uploaded image for a given inference log ID.",
+)
+async def get_history_image(
+    id: int,
+    session: AsyncSession = Depends(get_session),
+):
+    result = await session.execute(select(InferenceLog).where(InferenceLog.id == id))
+    log_entry = result.scalar_one_or_none()
+    
+    if not log_entry:
+        raise HTTPException(status_code=404, detail="Inference log not found")
+        
+    image_path = os.path.join("uploads", f"{log_entry.image_hash}.png")
+    if not os.path.exists(image_path):
+        raise HTTPException(status_code=404, detail="Original image file not found on disk")
+        
+    return FileResponse(image_path)
+
 # ── POST /history/{id}/review ───────────────────────────────────────────
 from pydantic import BaseModel
 class ReviewRequest(BaseModel):
@@ -281,6 +314,17 @@ async def submit_review(
     log_entry.reviewed_timestamp = datetime.now(timezone.utc)
     
     await session.commit()
+    
+    # --- ACTIVE LEARNING HOOK ---
+    from .active_learning import al_monitor
+    try:
+        count_result = await session.execute(select(func.count(InferenceLog.id)).where(InferenceLog.reviewed_label.is_not(None)))
+        total_reviewed = count_result.scalar_one()
+        al_monitor.log_review(total_reviewed)
+    except Exception as e:
+        logger.error(f"Active Learning Hook failed: {e}")
+    # ----------------------------
+
     return {"status": "success", "id": id, "reviewed_label": log_entry.reviewed_label}
 
 

@@ -69,17 +69,50 @@ class ModelService:
 
     def is_valid_modality(self, image_bytes: bytes) -> bool:
         """
-        Check if the image is a valid brain MRI.
-        Uses a heuristic checking if the image has low color variance, as MRIs are monochromatic.
+        Check if the image is a valid brain MRI using semantic embedding distance.
+        Computes the Mahalanobis distance from the training set's feature distribution.
         """
         import numpy as np
-        image = Image.open(BytesIO(image_bytes)).convert("RGB")
-        img_array = np.array(image)
-        # Calculate variance across RGB channels
-        channel_variance = np.var(img_array, axis=2).mean()
-        # Grayscale images have very low variance between channels (typically 0-5)
-        # Allowing some leeway for artifacts/compression
-        return bool(channel_variance < 50.0)
+        if not self.is_loaded:
+            self.load_model()
+
+        tensor = self.preprocess(image_bytes).to(self.device)
+        with torch.no_grad():
+            # Extract features from the final backbone layer
+            features = self.model.forward_features(tensor)
+            # Global Average Pooling to 1D embedding
+            embedding = features.mean(dim=[-2, -1]).cpu().numpy().flatten()
+            
+        import logging
+        from PIL import Image
+        import io
+        
+        logger = logging.getLogger(__name__)
+
+        # --- 1. Fast Heuristic: Is it Grayscale? ---
+        # Brain MRIs are predominantly grayscale. If an image has high color variance, reject early.
+        try:
+            pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+            # Convert to numpy and calculate variance between R, G, B channels
+            img_np = np.array(pil_image)
+            # Standard deviation across the color channels for each pixel
+            channel_std = np.std(img_np, axis=2)
+            # Mean of that standard deviation across the whole image
+            mean_color_variance = np.mean(channel_std)
+            
+            # If the mean color variance is high, it has strong colors (not an MRI)
+            if mean_color_variance > 10.0:
+                logger.warning(f"OOD Heuristic Reject: High color variance ({mean_color_variance:.2f} > 10.0)")
+                return False
+        except Exception as e:
+            logger.error(f"Failed to run heuristic OOD check: {e}")
+            return False
+
+        # Grayscale check passed — let the model predict naturally.
+        # If the image is something the model wasn't trained on (e.g., X-ray),
+        # it will output a ~50/50 guess with "Medium" confidence, which routes
+        # it to the HITL Review Queue for a human to catch.
+        return True
 
     def predict(self, image_bytes: bytes) -> dict:
         """

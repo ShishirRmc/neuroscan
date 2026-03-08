@@ -46,26 +46,59 @@ Probability scores are calibrated using **Temperature Scaling (T=1.5)** to ensur
 
 ---
 
+## 📊 Model Evaluation Summary
+
+The model was evaluated on a held-out test set of **389 images** (axial T1-weighted MRI).
+
+| Class | Precision | Recall | F1-Score | Support |
+|---|---|---|---|---|
+| **Healthy** | 1.00 | 0.98 | 0.99 | 120 |
+| **Tumor** | 0.99 | 1.00 | 1.00 | 269 |
+| **Overall (Macro Avg)** | **1.00** | **0.99** | **0.99** | **389** |
+
+*   **Split Strategy:** 80/10/10 (Train/Validation/Test).
+*   **Leakage Mitigation:** Perceptual Hashing (pHash) used to deduplicate scans before splitting.
+*   **Metrics:** Precision and recall were prioritized over raw accuracy to ensure reliability in detection.
+
+---
+
+### 🗄️ Database Strategy
+This prototype uses a dual-database approach for flexibility:
+*   **Local (Default):** A PostgreSQL instance is provided within the `docker-compose` stack. No manual installation is required if using Docker.
+*   **Production:** The system is configured to integrate with **Supabase** (PostgreSQL) for cloud persistence and remote audit logs.
+
+#### How to Switch:
+1.  Open `backend/.env` (or use the `.env.example` as a template).
+2.  Set `ENVIRONMENT=dev` to use the local Docker DB.
+3.  Set `ENVIRONMENT=prod` and provide a `PROD_DATABASE_URL` to use Supabase.
+
+---
+
 ## 🏗 Setup & Installation
+The easiest way to run the entire stack (Frontend, Backend, and Database) is using **Docker Compose**.
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- PostgreSQL
+### Quick Start (Docker - Recommended)
+1.  **Ensure Docker is running.**
+2.  **Start the stack (forces a clean build):**
+    ```bash
+    docker-compose up --build
+    ```
+    *Note: To run in the background, use `docker-compose up --build -d`.*
+3.  **Access the App:**
+    - Frontend: [http://localhost:3000](http://localhost:3000)
+    - API Documentation: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-### Backend Setup
-```bash
-cd backend
-pip install -r requirements.txt
-python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
-```
+### Manual Setup (Local Development)
 
-### Frontend Setup
-```bash
-cd frontend
-npm install
-npm run dev
-```
+#### Backend Setup
+1.  `cd backend`
+2.  `pip install -r requirements.txt`
+3.  `python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000`
+
+#### Frontend Setup
+1.  `cd frontend`
+2.  `npm install`
+3.  `npm run dev`
 
 ---
 

@@ -22,6 +22,7 @@ services:
     volumes:
       - ./models:/app/models
     environment:
+      - ENVIRONMENT=dev
       - DATABASE_URL=postgresql+asyncpg://app_user:app_password@db:5432/brain_tumor_app
     depends_on:
       db:
@@ -34,7 +35,8 @@ services:
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000
     depends_on:
-      - backend
+      backend:
+        condition: service_started
 
 volumes:
   pgdata:

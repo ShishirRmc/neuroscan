@@ -21,11 +21,11 @@ frontend/.env*
 frontend/.next/
 frontend/out/
 frontend/build/
+frontend/dist/
 
 # OS and IDEs
 .DS_Store
 .vscode/
 .idea/
 
-
-AI_Engineer_Challenge.docx.txt
+# AI_Engineer_Challenge.docx.txt

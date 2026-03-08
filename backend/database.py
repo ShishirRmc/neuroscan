@@ -10,7 +10,20 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from .config import settings
 
 # ── Engine & Session ────────────────────────────────────────────────────
-engine = create_async_engine(settings.DATABASE_URL, echo=False)
+engine_kwargs = {
+    "echo": False,
+}
+
+# Production-grade tuning for Supabase / Remote DBs
+if settings.ENVIRONMENT == "prod":
+    engine_kwargs.update({
+        "pool_size": settings.DB_POOL_SIZE,
+        "max_overflow": settings.DB_MAX_OVERFLOW,
+        "pool_pre_ping": True,
+        "pool_recycle": 3600,
+    })
+
+engine = create_async_engine(settings.DATABASE_URL, **engine_kwargs)
 async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

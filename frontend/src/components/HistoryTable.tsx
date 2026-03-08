@@ -123,7 +123,20 @@ export default function HistoryTable() {
                                         className="max-w-[140px] truncate px-4 py-3"
                                         style={{ color: "var(--text-primary)" }}
                                     >
-                                        {item.original_filename || "—"}
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded bg-slate-800 flex items-center justify-center overflow-hidden shrink-0 border border-slate-700">
+                                                <img
+                                                    src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/history/${item.id}/image`}
+                                                    alt="thumb"
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        // Fallback to text if image fails to load
+                                                        e.currentTarget.style.display = 'none';
+                                                    }}
+                                                />
+                                            </div>
+                                            <span className="truncate">{item.original_filename || "—"}</span>
+                                        </div>
                                     </td>
                                     <td
                                         className="px-4 py-3 font-medium capitalize"

@@ -93,6 +93,10 @@ export default function UploadZone({ onFileSelected, isLoading }: UploadZoneProp
                 >
                     JPEG, PNG · Max {MAX_SIZE_MB} MB
                 </p>
+                <div className="mt-4 flex items-center justify-center gap-2 bg-amber-500/10 text-amber-500/90 py-2 px-4 rounded-lg border border-amber-500/20 max-w-[280px]">
+                    <span className="text-sm">⚠️</span>
+                    <span className="text-[12px] font-bold tracking-tight">STRICTLY Brain MRIs Only</span>
+                </div>
 
                 <input
                     ref={inputRef}

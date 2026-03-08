@@ -68,9 +68,13 @@ export default function ReviewQueue() {
                         key={item.id}
                         className="flex flex-col md:flex-row gap-6 p-4 rounded-xl border border-slate-800 bg-slate-900/50"
                     >
-                        {/* Placeholder for image - in a real app we'd fetch the original or heatmap */}
-                        <div className="w-full md:w-32 h-32 rounded-lg bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">
-                            <ImageIcon size={24} className="text-slate-600" />
+                        {/* Image display */}
+                        <div className="w-full md:w-32 h-32 rounded-lg bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700 overflow-hidden relative group">
+                            <img 
+                                src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/history/${item.id}/image`} 
+                                alt={`Scan ${item.id}`}
+                                className="w-full h-full object-cover"
+                            />
                         </div>
 
                         <div className="flex-1 flex flex-col justify-between">
