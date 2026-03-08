@@ -1,5 +1,7 @@
 # NeuroScan AI: Brain Tumor Classification Prototype
 
+[![Demo Video](https://img.shields.io/badge/Watch-Demo_Video-blue?style=for-the-badge&logo=google-drive)](https://drive.google.com/file/d/1Po2a4tPI2_DE8kyiR8SycO6UrthsTE2n/view?usp=sharing)
+
 NeuroScan AI is a high-performance medical vision prototype designed for automated brain tumor classification from MRI scans. It features a robust FastAPI backend and a premium Next.js frontend, integrating advanced AI engineering practices.
 
 ## 🚀 Key Features
@@ -76,6 +78,9 @@ This prototype uses a dual-database approach for flexibility:
 
 ## 🏗 Setup & Installation
 The easiest way to run the entire stack (Frontend, Backend, and Database) is using **Docker Compose**.
+
+### Step 0: Download the Model
+Download the fine-tuned ConvNeXt model from [Google Drive (111MB)](https://drive.google.com/file/d/1ol0JuiD_IOQ0FrtecZHxvVa-FKwGYlJ2/view?usp=sharing) and place `model_v0.1.0.pt` inside the `models/` directory.
 
 ### Quick Start (Docker - Recommended)
 1.  **Ensure Docker is running.**
